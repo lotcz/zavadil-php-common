@@ -23,7 +23,7 @@ class JsonHelperPayloadTestPage extends PageBase {
 	 */
 	public array $content;
 
-	public function getContenType(): string {
+	public function getContentClass(): string {
 		return JsonHelperPayloadTestClass::class;
 	}
 

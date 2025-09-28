@@ -14,11 +14,11 @@ abstract class PageBase extends PayloadBase {
 
 	public array $content = [];
 
-	public abstract function getContenType(): string;
+	public abstract function getContentClass(): string;
 
 	public function setData(mixed $data) {
 		parent::setData($data);
-		$this->content = JsonHelper::hydrateToClass($this->getContenType(), $data->content);
+		$this->content = JsonHelper::hydrateToClass($this->getContentClass(), $data->content);
 	}
 
 }
