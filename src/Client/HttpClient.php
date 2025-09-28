@@ -130,23 +130,23 @@ class HttpClient implements RestClient {
 	}
 
 	public function get(string $endpoint, ?array $queryParams = [], ?string $className = null): mixed {
-		return $this->request($className, 'GET', $endpoint, $queryParams, null);
+		return $this->request('GET', $endpoint, $queryParams, null, $className);
 	}
 
 	public function post(string $endpoint, mixed $data, ?array $queryParams = [], ?string $className = null): mixed {
-		return $this->request($className, 'POST', $endpoint, [], $data);
+		return $this->request('POST', $endpoint, [], $data, $className);
 	}
 
 	public function put(string $endpoint, mixed $data, ?array $queryParams = [], ?string $className = null): mixed {
-		return $this->request($className, 'PUT', $endpoint, [], $data);
+		return $this->request('PUT', $endpoint, [], $data, $className);
 	}
 
 	public function patch(string $endpoint, mixed $data, ?array $queryParams = [], ?string $className = null): mixed {
-		return $this->request($className, 'PATCH', $endpoint, [], $data);
+		return $this->request('PATCH', $endpoint, [], $data, $className);
 	}
 
 	public function delete(string $endpoint, ?array $queryParams = []): void {
-		$this->request(null, 'DELETE', $endpoint, [], null, $statusCode);
+		$this->request('DELETE', $endpoint, [], null, null);
 	}
 
 }
