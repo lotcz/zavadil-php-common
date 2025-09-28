@@ -2,7 +2,7 @@
 
 namespace Zavadil\Common\Client\OAuth\Payload;
 
-use Zavadil\Common\Client\PayloadBase;
+use Zavadil\Common\Client\Payload\PayloadBase;
 
 class RequestIdTokenFromPrevTokenPayload extends PayloadBase {
 

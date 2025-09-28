@@ -5,7 +5,7 @@ namespace Zavadil\Common\Tests;
 use DateTimeInterface;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-use Zavadil\Common\Client\PayloadBase;
+use Zavadil\Common\Client\Payload\PayloadBase;
 use Zavadil\Common\Helpers\DateTimeHelper;
 
 class PayloadTestClass extends PayloadBase {

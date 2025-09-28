@@ -1,6 +1,6 @@
 <?php
 
-namespace Zavadil\Common\Client;
+namespace Zavadil\Common\Client\Payload;
 
 use DateTimeInterface;
 use ReflectionProperty;

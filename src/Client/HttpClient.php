@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zavadil\Common\Client;
 
+use Zavadil\Common\Helpers\JsonHelper;
 use Zavadil\Common\Helpers\StringHelper;
 
 /**
@@ -60,36 +61,6 @@ class HttpClient implements RestClient {
 		}
 	}
 
-	/**
-	 * Normalize PHP values for safe JSON encoding.
-	 * - DateTimeInterface => RFC3339 string (DATE_ATOM)
-	 * - Arrays and stdClass are normalized recursively
-	 * - Other scalars/objects are left as-is and rely on json_encode default behavior
-	 *
-	 * @param mixed $value
-	 * @return mixed
-	 */
-	private function normalizeForJson(mixed $value): mixed {
-		if ($value instanceof \DateTimeInterface) {
-			return $value->format(DATE_ATOM);
-		}
-		if (is_array($value)) {
-			$normalized = [];
-			foreach ($value as $k => $v) {
-				$normalized[$k] = $this->normalizeForJson($v);
-			}
-			return $normalized;
-		}
-		if ($value instanceof \stdClass) {
-			$vars = get_object_vars($value);
-			foreach ($vars as $k => $v) {
-				$vars[$k] = $this->normalizeForJson($v);
-			}
-			return (object)$vars;
-		}
-		return $value;
-	}
-
 	private function buildUrl(string $endpoint, ?array $queryParams = []): string {
 		$endpoint = ltrim($endpoint, '/');
 		$url = $this->baseUrl . '/' . $endpoint;
@@ -100,16 +71,14 @@ class HttpClient implements RestClient {
 		return $url;
 	}
 
-	/**
-	 * @param string $method
-	 * @param string $endpoint
-	 * @param array<string,mixed> $queryParams
-	 * @param mixed $body
-	 * @param int|null $outStatusCode Output parameter set to HTTP status code
-	 * @return mixed Decoded response (if JSON) or raw string
-	 * @throws \Exception on HTTP or cURL error
-	 */
-	private function request(string $method, string $endpoint, array $queryParams = [], mixed $body = null, ?int &$outStatusCode = null) {
+	private function request(
+		string $method,
+		string $endpoint,
+		array $queryParams = [],
+		mixed $body = null,
+		?string $className = null,
+		?int &$outStatusCode = null
+	) {
 		$url = $this->buildUrl($endpoint, $queryParams);
 
 		$ch = curl_init();
@@ -131,16 +100,8 @@ class HttpClient implements RestClient {
 			CURLOPT_HEADER => true, // so we can split headers and body
 		];
 
-		// Handle request body
 		if ($body !== null) {
-			// If body is array or object, encode as JSON by default
-			if (is_array($body) || is_object($body)) {
-				$normalized = $this->normalizeForJson($body);
-				$payload = json_encode($normalized, JSON_THROW_ON_ERROR);
-			} else {
-				$payload = (string)$body;
-			}
-			$options[CURLOPT_POSTFIELDS] = $payload;
+			$options[CURLOPT_POSTFIELDS] = JsonHelper::encode($body);
 		}
 
 		curl_setopt_array($ch, $options);
@@ -165,37 +126,27 @@ class HttpClient implements RestClient {
 			throw new \Exception("HTTP {$statusCode}: {$message}");
 		}
 
-		if (StringHelper::isBlank($responseBody)) {
-			return null;
-		}
-
-		try {
-			return json_decode($responseBody, false, 512, JSON_THROW_ON_ERROR);
-		} catch (\JsonException $_) {
-			// Fall through to return raw body if JSON invalid
-		}
-
-		return $responseBody;
+		return JsonHelper::decode($responseBody, $className);
 	}
 
-	public function get(string $endpoint, ?array $queryParams = []): mixed {
-		return $this->request('GET', $endpoint, $queryParams, null);
+	public function get(string $endpoint, ?array $queryParams = [], ?string $className = null): mixed {
+		return $this->request($className, 'GET', $endpoint, $queryParams, null);
 	}
 
-	public function post(string $endpoint, mixed $data): mixed {
-		return $this->request('POST', $endpoint, [], $data);
+	public function post(string $endpoint, mixed $data, ?array $queryParams = [], ?string $className = null): mixed {
+		return $this->request($className, 'POST', $endpoint, [], $data);
 	}
 
-	public function put(string $endpoint, mixed $data): mixed {
-		return $this->request('PUT', $endpoint, [], $data);
+	public function put(string $endpoint, mixed $data, ?array $queryParams = [], ?string $className = null): mixed {
+		return $this->request($className, 'PUT', $endpoint, [], $data);
 	}
 
-	public function patch(string $endpoint, mixed $data): mixed {
-		return $this->request('PATCH', $endpoint, [], $data);
+	public function patch(string $endpoint, mixed $data, ?array $queryParams = [], ?string $className = null): mixed {
+		return $this->request($className, 'PATCH', $endpoint, [], $data);
 	}
 
-	public function delete(string $endpoint): void {
-		$this->request('DELETE', $endpoint, [], null, $statusCode);
+	public function delete(string $endpoint, ?array $queryParams = []): void {
+		$this->request(null, 'DELETE', $endpoint, [], null, $statusCode);
 	}
 
 }

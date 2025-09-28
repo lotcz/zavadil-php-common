@@ -9,14 +9,14 @@ namespace Zavadil\Common\Client;
  */
 interface RestClient {
 
-	public function get(string $endpoint, ?array $queryParams = []): mixed;
+	public function get(string $endpoint, ?array $queryParams = [], ?string $className = null): mixed;
 
-	public function post(string $endpoint, mixed $data): mixed;
+	public function post(string $endpoint, mixed $data, ?array $queryParams = [], ?string $className = null): mixed;
 
-	public function put(string $endpoint, mixed $data): mixed;
+	public function put(string $endpoint, mixed $data, ?array $queryParams = [], ?string $className = null): mixed;
 
-	public function patch(string $endpoint, mixed $data): mixed;
+	public function patch(string $endpoint, mixed $data, ?array $queryParams = [], ?string $className = null): mixed;
 
-	public function delete(string $endpoint): void;
+	public function delete(string $endpoint, ?array $queryParams = []): void;
 
 }

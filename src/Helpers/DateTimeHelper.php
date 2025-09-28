@@ -25,4 +25,9 @@ class DateTimeHelper {
 		return $date;
 	}
 
+	public static function format(?DateTimeInterface $date): ?string {
+		if ($date === null) return null;
+		return $date->format(self::$format);
+	}
+
 }
