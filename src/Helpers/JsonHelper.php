@@ -47,21 +47,22 @@ class JsonHelper {
 		if (is_object($obj) && $className !== null) {
 			$instance = new $className();
 
-			if ($instance instanceof PayloadBase) {
-				$instance->setData($obj);
-			} else {
-				foreach ($obj as $key => $value) {
-					if (property_exists($instance, $key)) {
-						$rp = new ReflectionProperty($instance, $key);
-						$type = $rp->getType()?->getName();
-						if ($type === DateTimeInterface::class && is_string($value) && StringHelper::notBlank($value)) {
-							$instance->$key = DateTimeHelper::parse($value, true);
-						} else {
-							$instance->$key = self::hydrateToClass($type, $value, true);
-						}
+			foreach ($obj as $key => $value) {
+				if (property_exists($instance, $key)) {
+					$rp = new ReflectionProperty($instance, $key);
+					$type = $rp->getType()?->getName();
+					if ($type === DateTimeInterface::class && is_string($value) && StringHelper::notBlank($value)) {
+						$instance->$key = DateTimeHelper::parse($value, true);
+					} else {
+						$instance->$key = self::hydrateToClass($type, $value, true);
 					}
 				}
 			}
+
+			if ($instance instanceof PayloadBase) {
+				$instance->hydrateData($obj);
+			}
+
 			return $instance;
 		}
 

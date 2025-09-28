@@ -16,8 +16,7 @@ abstract class PageBase extends PayloadBase {
 
 	public abstract function getContentClass(): string;
 
-	public function setData(mixed $data) {
-		parent::setData($data);
+	public function hydrateData(mixed $data) {
 		$this->content = JsonHelper::hydrateToClass($this->getContentClass(), $data->content);
 	}
 
