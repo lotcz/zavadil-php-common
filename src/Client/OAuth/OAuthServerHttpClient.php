@@ -12,7 +12,7 @@ use Zavadil\Common\Client\OAuth\Payload\RequestIdTokenFromLoginPayload;
 use Zavadil\Common\Client\OAuth\Payload\RequestIdTokenFromPrevTokenPayload;
 use Zavadil\Common\Helpers\PathHelper;
 
-class OAuthHttpClient extends HttpClient {
+class OAuthServerHttpClient extends HttpClient {
 
 	public function __construct(string $oauthUrl) {
 		parent::__construct(PathHelper::of($oauthUrl, "/api/oauth"));

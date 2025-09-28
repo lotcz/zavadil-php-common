@@ -17,7 +17,7 @@ class OAuthTokenManager {
 
 	private string $password;
 
-	private OAuthHttpClient $oAuthServer;
+	private OAuthServerHttpClient $oAuthServer;
 
 	private ?IdTokenPayload $idToken = null;
 
@@ -27,7 +27,7 @@ class OAuthTokenManager {
 		$this->audience = $targetAudience;
 		$this->login = $login;
 		$this->password = $password;
-		$this->oAuthServer = new OAuthHttpClient($oAuthServerBaseUrl);
+		$this->oAuthServer = new OAuthServerHttpClient($oAuthServerBaseUrl);
 	}
 
 	private function hasValidIdToken(): bool {

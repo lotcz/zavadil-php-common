@@ -5,7 +5,7 @@ namespace Zavadil\Common\Client\OAuth;
 use Zavadil\Common\Client\HttpClient;
 use Zavadil\Common\Client\OAuth\Payload\ServerOAuthInfoPayload;
 
-class RestClientWithOAuth extends HttpClient {
+class HttpClientWithOAuth extends HttpClient {
 
 	private string $login;
 
