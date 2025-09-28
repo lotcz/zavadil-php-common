@@ -28,7 +28,7 @@ class RestClientWithOAuth extends HttpClient {
 	public function getServerInfo(): ServerOAuthInfoPayload {
 		if ($this->serverInfo === null) {
 			$insecureClient = new HttpClient($this->baseUrl);
-			$this->serverInfo = $insecureClient->get("status/oauth/info");
+			$this->serverInfo = $insecureClient->get("api/status/oauth/info");
 		}
 		return $this->serverInfo;
 	}
