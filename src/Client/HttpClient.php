@@ -61,7 +61,7 @@ class HttpClient implements RestClient {
 		}
 	}
 
-	private function buildUrl(string $endpoint, ?array $queryParams = []): string {
+	private function buildUrl(string $endpoint, ?array $queryParams = null): string {
 		$endpoint = ltrim($endpoint, '/');
 		$url = $this->baseUrl . '/' . $endpoint;
 		if (!empty($queryParams)) {
@@ -74,7 +74,7 @@ class HttpClient implements RestClient {
 	private function request(
 		string $method,
 		string $endpoint,
-		array $queryParams = [],
+		?array $queryParams = null,
 		mixed $body = null,
 		?string $className = null,
 		?int &$outStatusCode = null
@@ -134,19 +134,19 @@ class HttpClient implements RestClient {
 	}
 
 	public function post(string $endpoint, mixed $data, ?array $queryParams = [], ?string $className = null): mixed {
-		return $this->request('POST', $endpoint, [], $data, $className);
+		return $this->request('POST', $endpoint, $queryParams, $data, $className);
 	}
 
 	public function put(string $endpoint, mixed $data, ?array $queryParams = [], ?string $className = null): mixed {
-		return $this->request('PUT', $endpoint, [], $data, $className);
+		return $this->request('PUT', $endpoint, $queryParams, $data, $className);
 	}
 
 	public function patch(string $endpoint, mixed $data, ?array $queryParams = [], ?string $className = null): mixed {
-		return $this->request('PATCH', $endpoint, [], $data, $className);
+		return $this->request('PATCH', $endpoint, $queryParams, $data, $className);
 	}
 
 	public function delete(string $endpoint, ?array $queryParams = []): void {
-		$this->request('DELETE', $endpoint, [], null, null);
+		$this->request('DELETE', $endpoint, $queryParams, null, null);
 	}
 
 }
