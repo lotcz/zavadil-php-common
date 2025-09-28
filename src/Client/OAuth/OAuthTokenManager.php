@@ -19,7 +19,7 @@ class OAuthTokenManager {
 
 	private OAuthHttpClient $oAuthServer;
 
-	private ?IdTokenPayload $idToken;
+	private ?IdTokenPayload $idToken = null;
 
 	private array $accessTokens = [];
 
