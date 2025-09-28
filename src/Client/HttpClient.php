@@ -11,21 +11,18 @@ use Zavadil\Common\Helpers\StringHelper;
  */
 class HttpClient implements RestClient {
 
-	/** @var string */
 	protected string $baseUrl;
 
-	/** @var int */
 	protected int $timeout;
 
-	/**
-	 * @param string $baseUrl Base URL to prepend to endpoints (optional)
-	 * @param int $timeout Timeout in seconds for requests
-	 */
 	public function __construct(string $baseUrl = '', int $timeout = 30) {
 		$this->baseUrl = rtrim($baseUrl, '/');
 		$this->timeout = $timeout;
 	}
 
+	/**
+	 * Override this in inherited class to provide different headers
+	 */
 	protected function getHeaders(): array {
 		return [
 			'Accept' => 'application/json, */*;q=0.8',
@@ -33,14 +30,69 @@ class HttpClient implements RestClient {
 		];
 	}
 
+	private function prepareHeaders(): array {
+		$headers = $this->getHeaders();
+
+		// Convert associative headers to cURL format
+		$curlHeaders = [];
+		foreach ($headers as $name => $value) {
+			$curlHeaders[] = $name . ': ' . $value;
+		}
+		return $curlHeaders;
+	}
+
+	private function extractErrorMessage(string $body): ?string {
+		if (StringHelper::isBlank($body)) {
+			return null;
+		}
+		try {
+			$data = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+			if (is_array($data)) {
+				foreach (['message', 'error', 'detail', 'description'] as $key) {
+					if (isset($data[$key]) && is_string($data[$key])) {
+						return $data[$key];
+					}
+				}
+			}
+			return $body;
+		} catch (\JsonException $_) {
+			return $body;
+		}
+	}
+
 	/**
-	 * Build full URL from base and endpoint and query params
-	 * @param string $endpoint
-	 * @param array<string,mixed> $queryParams
+	 * Normalize PHP values for safe JSON encoding.
+	 * - DateTimeInterface => RFC3339 string (DATE_ATOM)
+	 * - Arrays and stdClass are normalized recursively
+	 * - Other scalars/objects are left as-is and rely on json_encode default behavior
+	 *
+	 * @param mixed $value
+	 * @return mixed
 	 */
-	private function buildUrl(string $endpoint, array $queryParams = []): string {
+	private function normalizeForJson(mixed $value): mixed {
+		if ($value instanceof \DateTimeInterface) {
+			return $value->format(DATE_ATOM);
+		}
+		if (is_array($value)) {
+			$normalized = [];
+			foreach ($value as $k => $v) {
+				$normalized[$k] = $this->normalizeForJson($v);
+			}
+			return $normalized;
+		}
+		if ($value instanceof \stdClass) {
+			$vars = get_object_vars($value);
+			foreach ($vars as $k => $v) {
+				$vars[$k] = $this->normalizeForJson($v);
+			}
+			return (object)$vars;
+		}
+		return $value;
+	}
+
+	private function buildUrl(string $endpoint, ?array $queryParams = []): string {
 		$endpoint = ltrim($endpoint, '/');
-		$url = $this->baseUrl !== '' ? $this->baseUrl . '/' . $endpoint : $endpoint;
+		$url = $this->baseUrl . '/' . $endpoint;
 		if (!empty($queryParams)) {
 			$query = http_build_query($queryParams);
 			$url .= (str_contains($url, '?') ? '&' : '?') . $query;
@@ -57,7 +109,7 @@ class HttpClient implements RestClient {
 	 * @return mixed Decoded response (if JSON) or raw string
 	 * @throws \Exception on HTTP or cURL error
 	 */
-	private function request(string $method, string $endpoint, array $queryParams = [], $body = null, ?int &$outStatusCode = null) {
+	private function request(string $method, string $endpoint, array $queryParams = [], mixed $body = null, ?int &$outStatusCode = null) {
 		$url = $this->buildUrl($endpoint, $queryParams);
 
 		$ch = curl_init();
@@ -65,7 +117,7 @@ class HttpClient implements RestClient {
 			throw new \Exception('Failed to initialize cURL');
 		}
 
-		$headers = $this->prepareHeaders($body);
+		$headers = $this->prepareHeaders();
 
 		$options = [
 			CURLOPT_URL => $url,
@@ -103,7 +155,6 @@ class HttpClient implements RestClient {
 
 		$statusCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
 		$headerSize = (int)curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-		$rawHeaders = substr($response, 0, $headerSize) ?: '';
 		$responseBody = substr($response, $headerSize) ?: '';
 		curl_close($ch);
 
@@ -114,126 +165,37 @@ class HttpClient implements RestClient {
 			throw new \Exception("HTTP {$statusCode}: {$message}");
 		}
 
-		// Try to decode JSON if response looks like JSON
-		$contentType = $this->getHeaderValue($rawHeaders, 'Content-Type');
-		if ($contentType !== null && str_contains(strtolower($contentType), 'application/json')) {
-			if ($responseBody === '' || $responseBody === false) {
-				return null;
-			}
-			try {
-				/** @var mixed */
-				$decoded = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
-				return $decoded;
-			} catch (\JsonException $_) {
-				// Fall through to return raw body if JSON invalid
-			}
+		if (StringHelper::isBlank($responseBody)) {
+			return null;
+		}
+
+		try {
+			return json_decode($responseBody, false, 512, JSON_THROW_ON_ERROR);
+		} catch (\JsonException $_) {
+			// Fall through to return raw body if JSON invalid
 		}
 
 		return $responseBody;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function get(string $endpoint, array $queryParams = []) {
+	public function get(string $endpoint, ?array $queryParams = []): mixed {
 		return $this->request('GET', $endpoint, $queryParams, null);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function post(string $endpoint, $data) {
+	public function post(string $endpoint, mixed $data): mixed {
 		return $this->request('POST', $endpoint, [], $data);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function put(string $endpoint, $data) {
+	public function put(string $endpoint, mixed $data): mixed {
 		return $this->request('PUT', $endpoint, [], $data);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function patch(string $endpoint, array $data) {
+	public function patch(string $endpoint, mixed $data): mixed {
 		return $this->request('PATCH', $endpoint, [], $data);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function delete(string $endpoint): bool {
+	public function delete(string $endpoint): void {
 		$this->request('DELETE', $endpoint, [], null, $statusCode);
-		return $statusCode >= 200 && $statusCode < 300;
-	}
-
-	/**
-	 * Prepare headers array for cURL
-	 * @param mixed $body
-	 * @return array<int,string>
-	 */
-	private function prepareHeaders($body): array {
-		$headers = $this->getHeaders();
-
-		// Convert associative headers to cURL format
-		$curlHeaders = [];
-		foreach ($headers as $name => $value) {
-			$curlHeaders[] = $name . ': ' . $value;
-		}
-		return $curlHeaders;
-	}
-
-	/**
-	 * Extract error message from a JSON body or return null
-	 */
-	private function extractErrorMessage(string $body): ?string {
-		if (StringHelper::isBlank($body)) {
-			return null;
-		}
-		try {
-			$data = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
-			if (is_array($data)) {
-				foreach (['message', 'error', 'detail', 'description'] as $key) {
-					if (isset($data[$key]) && is_string($data[$key])) {
-						return $data[$key];
-					}
-				}
-			}
-			return $body;
-		} catch (\JsonException $_) {
-			return $body;
-		}
-	}
-
-	/**
-	 * Normalize PHP values for safe JSON encoding.
-	 * - DateTimeInterface => RFC3339 string (DATE_ATOM)
-	 * - Arrays and stdClass are normalized recursively
-	 * - Other scalars/objects are left as-is and rely on json_encode default behavior
-	 *
-	 * @param mixed $value
-	 * @return mixed
-	 */
-	private function normalizeForJson($value) {
-		if ($value instanceof \DateTimeInterface) {
-			return $value->format(DATE_ATOM);
-		}
-		if (is_array($value)) {
-			$normalized = [];
-			foreach ($value as $k => $v) {
-				$normalized[$k] = $this->normalizeForJson($v);
-			}
-			return $normalized;
-		}
-		if ($value instanceof \stdClass) {
-			$vars = get_object_vars($value);
-			foreach ($vars as $k => $v) {
-				$vars[$k] = $this->normalizeForJson($v);
-			}
-			return (object)$vars;
-		}
-		return $value;
 	}
 
 }

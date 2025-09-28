@@ -2,7 +2,9 @@
 
 namespace Zavadil\Common\Client\OAuth\Payload;
 
-class RequestIdTokenFromPrevTokenPayload {
+use Zavadil\Common\Client\PayloadBase;
+
+class RequestIdTokenFromPrevTokenPayload extends PayloadBase {
 
 	public ?string $idToken = null;
 

@@ -23,18 +23,30 @@ class OAuthHttpClient extends HttpClient {
 	}
 
 	public function verifyIdToken(string $idToken): IdTokenPayload {
-		return $this->get("id-tokens/verify/{$idToken}");
+		$data = $this->get("id-tokens/verify/{$idToken}");
+		$payload = new IdTokenPayload();
+		$payload->setData($data);
+		return $payload;
 	}
 
 	public function requestIdTokenFromLogin(RequestIdTokenFromLoginPayload $request): IdTokenPayload {
-		return $this->post('id-tokens/from-login', $request);
+		$data = $this->post('id-tokens/from-login', $request);
+		$payload = new IdTokenPayload();
+		$payload->setData($data);
+		return $payload;
 	}
 
 	public function refreshIdToken(RequestIdTokenFromPrevTokenPayload $request): IdTokenPayload {
-		return $this->post('id-tokens/refresh', $request);
+		$data = $this->post('id-tokens/refresh', $request);
+		$payload = new IdTokenPayload();
+		$payload->setData($data);
+		return $payload;
 	}
 
 	public function requestAccessToken(RequestAccessTokenPayload $request): AccessTokenPayload {
-		return $this->post('access-tokens/from-id-token', $request);
+		$data = $this->post('access-tokens/from-id-token', $request);
+		$payload = new AccessTokenPayload();
+		$payload->setData($data);
+		return $payload;
 	}
 }

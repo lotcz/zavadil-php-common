@@ -2,7 +2,9 @@
 
 namespace Zavadil\Common\Client\OAuth\Payload;
 
-class ServerOAuthInfoPayload {
+use Zavadil\Common\Client\PayloadBase;
+
+class ServerOAuthInfoPayload extends PayloadBase {
 
 	public bool $debugMode;
 

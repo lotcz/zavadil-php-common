@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Zavadil\Common\Client\OAuth\Payload;
 
 use DateTimeInterface;
+use Zavadil\Common\Client\PayloadBase;
 
-class TokenResponsePayloadBase {
-	
+class TokenResponsePayloadBase extends PayloadBase {
+
 	public ?string $token = null;
 
 	public ?DateTimeInterface $issuedAt = null;
