@@ -8,13 +8,10 @@ use Zavadil\Common\Helpers\DateTimeHelper;
 use Zavadil\Common\Helpers\JsonHelper;
 
 class JsonHelperTestClass {
-
 	public string $stringField;
-
 	public int $intField;
-
+	public bool $boolField;
 	public ?DateTimeInterface $dateField;
-
 	public ?JsonHelperTestClass $jsonHelperTest;
 }
 
@@ -26,9 +23,10 @@ class JsonHelperTest extends TestCase {
 		$obj = new JsonHelperTestClass();
 		$obj->stringField = "test";
 		$obj->intField = 10;
+		$obj->boolField = true;
 		$obj->dateField = DateTimeHelper::parse("2025-09-29T11:26:32.373208406Z");
 
-		$json = "{\"stringField\":\"test\",\"intField\":10,\"dateField\":\"2025-09-29T11:26:32.373208Z\"}";
+		$json = "{\"stringField\":\"test\",\"intField\":10,\"boolField\":true,\"dateField\":\"2025-09-29T11:26:32.373208+00:00\"}";
 
 		$encoded = JsonHelper::encode($obj);
 
@@ -39,6 +37,7 @@ class JsonHelperTest extends TestCase {
 		$obj = new JsonHelperTestClass();
 		$obj->stringField = "testNested";
 		$obj->intField = 123;
+		$obj->boolField = false;
 		$obj->dateField = DateTimeHelper::parse("2025-09-29T11:26:32.373208406Z");
 
 		$obj->jsonHelperTest = new JsonHelperTestClass();
@@ -46,8 +45,8 @@ class JsonHelperTest extends TestCase {
 		$obj->jsonHelperTest->intField = 10;
 		$obj->jsonHelperTest->dateField = DateTimeHelper::parse("2025-10-29T11:26:32.373208406Z");
 
-		$json = "{\"stringField\":\"test\",\"intField\":10,\"dateField\":\"2025-10-29T11:26:32.373208Z\"}";
-		$jsonNested = "{\"stringField\":\"testNested\",\"intField\":123,\"dateField\":\"2025-09-29T11:26:32.373208Z\",\"jsonHelperTest\":$json}";
+		$json = "{\"stringField\":\"test\",\"intField\":10,\"dateField\":\"2025-10-29T11:26:32.373208+00:00\"}";
+		$jsonNested = "{\"stringField\":\"testNested\",\"intField\":123,\"boolField\":false,\"dateField\":\"2025-09-29T11:26:32.373208+00:00\",\"jsonHelperTest\":$json}";
 
 		$encoded = JsonHelper::encode($obj);
 
@@ -71,8 +70,8 @@ class JsonHelperTest extends TestCase {
 
 		$arr[] = $obj2;
 
-		$json1 = "{\"stringField\":\"test1\",\"intField\":1,\"dateField\":\"2025-09-29T11:26:32.373208Z\"}";
-		$json2 = "{\"stringField\":\"test2\",\"intField\":2,\"dateField\":\"2025-10-29T11:26:32.373208Z\"}";
+		$json1 = "{\"stringField\":\"test1\",\"intField\":1,\"dateField\":\"2025-09-29T11:26:32.373208+00:00\"}";
+		$json2 = "{\"stringField\":\"test2\",\"intField\":2,\"dateField\":\"2025-10-29T11:26:32.373208+00:00\"}";
 		$json = "[$json1,$json2]";
 
 		$encoded = JsonHelper::encode($arr);
@@ -83,12 +82,13 @@ class JsonHelperTest extends TestCase {
 	// DECODE
 
 	public function testDecode() {
-		$json = "{\"stringField\": \"test\",\"intField\": 10,\"dateField\": \"2025-09-29T11:26:32.373208406Z\"}";
+		$json = "{\"stringField\": \"test\",\"intField\": 10,\"boolField\": false,\"dateField\": \"2025-09-29T11:26:32.373208406Z\"}";
 
 		$decoded = JsonHelper::decode($json, JsonHelperTestClass::class);
 
-		$this->assertEquals($decoded->stringField, "test");
-		$this->assertEquals($decoded->intField, 10);
+		$this->assertEquals("test", $decoded->stringField);
+		$this->assertEquals(10, $decoded->intField);
+		$this->assertTrue($decoded->boolField === false);
 
 		$date = DateTimeHelper::parse("2025-09-29T11:26:32.373208406Z");
 		$this->assertEquals($date->getTimestamp(), $decoded->dateField->getTimestamp());

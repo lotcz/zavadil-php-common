@@ -12,6 +12,7 @@ use Zavadil\Common\Helpers\JsonHelper;
 class JsonHelperPayloadTestClass extends PayloadBase {
 	public string $stringField;
 	public int $intField;
+	public bool $boolField;
 	public ?DateTimeInterface $dateField;
 	public ?JsonHelperPayloadTestClass $jsonHelperTest;
 }
@@ -43,11 +44,12 @@ class JsonHelperAndPayloadTest extends TestCase {
 			$obj = new JsonHelperPayloadTestClass();
 			$obj->stringField = "test";
 			$obj->intField = 10;
+			$obj->boolField = true;
 			$obj->dateField = DateTimeHelper::parse("2025-09-29T11:26:32.373208406Z");
 			$page->content[] = $obj;
 		}
 
-		$json = "{\"stringField\":\"test\",\"intField\":10,\"dateField\":\"2025-09-29T11:26:32.373208Z\"}";
+		$json = "{\"stringField\":\"test\",\"intField\":10,\"boolField\":true,\"dateField\":\"2025-09-29T11:26:32.373208+00:00\"}";
 		$content = [];
 		for ($i = 0; $i < $page->pageSize; $i++) {
 			$content[] = $json;
@@ -63,7 +65,7 @@ class JsonHelperAndPayloadTest extends TestCase {
 	// DECODE
 
 	public function testDecodePage() {
-		$json = "{\"stringField\":\"test\",\"intField\":10,\"dateField\":\"2025-09-29T11:26:32.373208Z\"}";
+		$json = "{\"stringField\":\"test\",\"intField\":10,\"boolField\":false,\"dateField\":\"2025-09-29T11:26:32.373208+00:00\"}";
 		$content = [];
 		for ($i = 0; $i < 10; $i++) {
 			$content[] = $json;
@@ -83,6 +85,7 @@ class JsonHelperAndPayloadTest extends TestCase {
 		$this->assertTrue($obj2 instanceof JsonHelperPayloadTestClass);
 		$this->assertEquals($obj2->stringField, "test");
 		$this->assertEquals($obj2->intField, 10);
+		$this->assertTrue($obj2->boolField === false);
 		$date = DateTimeHelper::parse("2025-09-29T11:26:32.373208406Z");
 		$this->assertEquals($date->getTimestamp(), $obj2->dateField->getTimestamp());
 	}
