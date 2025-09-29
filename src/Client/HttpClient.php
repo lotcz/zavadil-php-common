@@ -6,6 +6,7 @@ namespace Zavadil\Common\Client;
 
 use Zavadil\Common\Helpers\JsonHelper;
 use Zavadil\Common\Helpers\StringHelper;
+use Zavadil\Common\Helpers\UrlHelper;
 
 /**
  * Simple cURL-based HTTP client implementing RestClient
@@ -62,13 +63,7 @@ class HttpClient implements RestClient {
 	}
 
 	private function buildUrl(string $endpoint, ?array $queryParams = null): string {
-		$endpoint = ltrim($endpoint, '/');
-		$url = $this->baseUrl . '/' . $endpoint;
-		if (!empty($queryParams)) {
-			$query = http_build_query($queryParams);
-			$url .= (str_contains($url, '?') ? '&' : '?') . $query;
-		}
-		return $url;
+		return UrlHelper::of($this->baseUrl, $endpoint, $queryParams);
 	}
 
 	private function request(
