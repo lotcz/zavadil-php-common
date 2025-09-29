@@ -12,10 +12,10 @@ use Exception;
 class DateTimeHelper {
 
 	public static array $formats = [
-		'Y-m-d\TH:i:s.uT',
+		'Y-m-d\TH:i:s.uP',
 		'Y-m-d\TH:i:sT',
+		'Y-m-d\TH:i:sP'
 	];
-
 
 	public static function parse(?string $str, bool $immutable = false): ?DateTimeInterface {
 		if (StringHelper::isBlank($str)) return null;
