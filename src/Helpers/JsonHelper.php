@@ -80,6 +80,7 @@ class JsonHelper {
 	}
 
 	public static function decode(?string $data, ?string $className = null): mixed {
+		if (StringHelper::isBlank($data)) return null;
 		$obj = json_decode($data, false, 512, JSON_THROW_ON_ERROR);
 		return self::hydrateToClass($className, $obj);
 	}
