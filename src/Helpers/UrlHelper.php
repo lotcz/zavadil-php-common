@@ -14,5 +14,14 @@ class UrlHelper {
 		}
 		return $url;
 	}
-
+	
+	static function slugify(string $str, string $encoding = 'UTF-8'): string {
+		if (StringHelper::isBlank($str)) return '';
+		$result = StringHelper::trimSpecial($str);
+		$result = StringHelper::transliterate($result, $encoding);
+		$result = strtolower($result);
+		$result = preg_replace("/[^a-zA-Z0-9\/_| -]/", '', $result);
+		$result = preg_replace("/[_| -\/]+/", '-', $result);
+		return $result;
+	}
 }
