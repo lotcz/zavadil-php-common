@@ -1,6 +1,6 @@
 {
   "name": "lotcz/zavadil-php-common",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "description": "Common PHP utilities and helper functions",
   "type": "library",
   "license": "MIT",
