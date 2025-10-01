@@ -8,12 +8,12 @@ class StringHelper {
 
 	public static function strlen(?string $str): int {
 		if ($str === null) return 0;
-		return strlen($str);
+		return mb_strlen($str);
 	}
 
 	public static function isBlank(?string $str): bool {
 		if ($str === null) return true;
-		return (strlen(StringHelper::trim($str)) === 0);
+		return (self::strlen(StringHelper::trim($str)) === 0);
 	}
 
 	public static function notBlank(?string $str): bool {
@@ -22,7 +22,7 @@ class StringHelper {
 
 	public static function trim(?string $str, ?string $characters = null): string {
 		if ($str === null) return '';
-		return $characters === null ? trim($str) : trim($str, $characters);
+		return $characters === null ? mb_trim($str) : mb_trim($str, $characters);
 	}
 
 	static function trimSpecial($s) {
@@ -50,7 +50,7 @@ class StringHelper {
 		if (self::isBlank($str)) return null;
 		if (self::strlen($str) > $len) {
 			$length = $len - self::strlen($ellipsis);
-			return substr($str, 0, $length) . $ellipsis;
+			return mb_substr($str, 0, $length) . $ellipsis;
 		} else {
 			return $str;
 		}
