@@ -25,8 +25,28 @@ class StringHelper {
 		return $characters === null ? mb_trim($str) : mb_trim($str, $characters);
 	}
 
+	public static function ltrim(?string $str, ?string $characters = null): string {
+		if ($str === null) return '';
+		return $characters === null ? mb_ltrim($str) : mb_ltrim($str, $characters);
+	}
+
+	public static function rtrim(?string $str, ?string $characters = null): string {
+		if ($str === null) return '';
+		return $characters === null ? mb_rtrim($str) : mb_rtrim($str, $characters);
+	}
+
+	static string $specialChars = ' .,-*/?!\'"';
+
 	static function trimSpecial($s) {
-		return self::trim($s, ' .,-*/?!\'"');
+		return self::trim($s, self::$specialChars);
+	}
+
+	static function ltrimSpecial($s) {
+		return self::ltrim($s, self::$specialChars);
+	}
+
+	static function rtrimSpecial($s) {
+		return self::rtrim($s, self::$specialChars);
 	}
 
 	static array $czech_transliteration = [
