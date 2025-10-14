@@ -79,4 +79,12 @@ class StringHelper {
 	static function ellipsis(?string $str, int $len = 100): ?string {
 		return self::shorten($str, $len);
 	}
+
+	static function lowercase(?string $str): ?string {
+		return self::isBlank($str) ? null : strtolower($str);
+	}
+
+	static function uppercase(?string $str): ?string {
+		return self::isBlank($str) ? null : strtoupper($str);
+	}
 }
