@@ -31,9 +31,10 @@ class DateTimeHelper {
 		throw new Exception("Datetime value '$str' is invalid");
 	}
 
-	public static function format(?DateTimeInterface $date): ?string {
+	public static function format(?DateTimeInterface $date, ?string $format = null): ?string {
 		if ($date === null) return null;
-		return $date->format(self::$formats[0]);
+		if ($format === null) $format = self::$formats[0];
+		return $date->format($format);
 	}
 
 }
