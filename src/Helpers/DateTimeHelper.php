@@ -37,4 +37,19 @@ class DateTimeHelper {
 		return $date->format($format);
 	}
 
+	public static function year(?DateTimeInterface $date = null): int {
+		if ($date === null) return self::year(new DateTimeImmutable());
+		return intval($date->format("Y"));
+	}
+
+	public static function month(?DateTimeInterface $date = null): int {
+		if ($date === null) return self::month(new DateTimeImmutable());
+		return intval($date->format("n"));
+	}
+
+	public static function day(?DateTimeInterface $date = null): int {
+		if ($date === null) return self::day(new DateTimeImmutable());
+		return intval($date->format("j"));
+	}
+
 }
