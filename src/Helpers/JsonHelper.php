@@ -12,7 +12,7 @@ class JsonHelper {
 
 	/**
 	 * Normalize PHP values for safe JSON encoding.
-	 * - DateTimeInterface => RFC3339 string (DATE_ATOM)
+	 * - DateTimeInterface => RFC3339 string (DATE_ATOM) with microseconds
 	 * - Arrays and stdClass are normalized recursively
 	 * - Other scalars/objects are left as-is and rely on json_encode default behavior
 	 *
@@ -21,7 +21,7 @@ class JsonHelper {
 	 */
 	public static function normalizeForJson(mixed $value): mixed {
 		if ($value instanceof DateTimeInterface) {
-			return DateTimeHelper::format($value);
+			return DateTimeHelper::formatForJson($value);
 		}
 		if (is_array($value)) {
 			$normalized = [];

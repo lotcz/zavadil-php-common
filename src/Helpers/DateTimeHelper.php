@@ -12,10 +12,12 @@ use Exception;
 
 class DateTimeHelper {
 
+	public const string FORMAT_JSON = 'Y-m-d\TH:i:s.uP';
+
 	public static array $formats = [
-		'Y-m-d\TH:i:s.uP', /* ISO with microseconds and offset */
+		self::FORMAT_JSON, /* ISO with microseconds and offset */
 		'Y-m-d\TH:i:sT', /* ISO with time zone */
-		'Y-m-d\TH:i:sP', /* ISO with offset */
+		DateTimeInterface::W3C, /* ISO with offset */
 		DateTimeInterface::RFC7231, /* http dates */
 		DateTimeInterface::RSS,
 	];
@@ -51,7 +53,11 @@ class DateTimeHelper {
 	}
 
 	public static function formatForJson(DateTimeInterface $date): ?string {
-		return self::format($date, DateTimeInterface::RFC3339_EXTENDED);
+		return self::format($date, self::FORMAT_JSON);
+	}
+
+	public static function formatForSitemap(DateTimeInterface $date): string {
+		return self::format($date, DateTimeInterface::W3C);
 	}
 
 	public static function formatAsGmt(DateTimeInterface $date, string $format): string {
