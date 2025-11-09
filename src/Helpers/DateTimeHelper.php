@@ -7,14 +7,16 @@ namespace Zavadil\Common\Helpers;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use DateTimeZone;
 use Exception;
 
 class DateTimeHelper {
 
 	public static array $formats = [
-		'Y-m-d\TH:i:s.uP',
-		'Y-m-d\TH:i:sT',
-		'Y-m-d\TH:i:sP'
+		'Y-m-d\TH:i:s.uP', /* ISO with microseconds and offset */
+		'Y-m-d\TH:i:sT', /* ISO with time zone */
+		'Y-m-d\TH:i:sP', /* ISO with offset */
+		DateTimeInterface::RFC7231 /* http dates */
 	];
 
 	public static function parse(?string $str, bool $immutable = false): ?DateTimeInterface {
@@ -35,6 +37,12 @@ class DateTimeHelper {
 		if ($date === null) return null;
 		if ($format === null) $format = self::$formats[0];
 		return $date->format($format);
+	}
+
+	public static function formatForHttp(DateTimeInterface $date): ?string {
+		$gmtdate = DateTime::createFromInterface($date);
+		$gmtdate->setTimezone(new DateTimeZone('GMT'));
+		return $gmtdate->format(DateTimeInterface::RFC7231);
 	}
 
 	public static function year(?DateTimeInterface $date = null): int {
