@@ -52,6 +52,10 @@ class DateTimeHelper {
 		return $date->format($format);
 	}
 
+	public static function formatAsGmt(DateTimeInterface $date, string $format): string {
+		return self::format(self::toGmt($date), $format);
+	}
+
 	public static function formatForJson(DateTimeInterface $date): ?string {
 		return self::format($date, self::FORMAT_JSON);
 	}
@@ -60,16 +64,12 @@ class DateTimeHelper {
 		return self::format($date, DateTimeInterface::W3C);
 	}
 
-	public static function formatAsGmt(DateTimeInterface $date, string $format): string {
-		return self::format(self::toGmt($date), $format);
-	}
-
 	public static function formatForHttp(DateTimeInterface $date): string {
 		return self::formatAsGmt($date, DateTimeInterface::RFC7231);
 	}
 
 	public static function formatForRss(DateTimeInterface $date): string {
-		return self::formatAsGmt($date, DateTimeInterface::RSS);
+		return self::format($date, DateTimeInterface::RSS);
 	}
 
 	public static function year(?DateTimeInterface $date = null): int {
