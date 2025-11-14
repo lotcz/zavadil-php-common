@@ -20,6 +20,14 @@ class StringHelper {
 		return !self::isBlank($str);
 	}
 
+	public static function blankToNull(?string $str): ?string {
+		return self::isBlank($str) ? null : $str;
+	}
+
+	public static function emptyToNull(?string $str): ?string {
+		return empty($str) ? null : $str;
+	}
+
 	public static function trim(?string $str, ?string $characters = null): string {
 		if ($str === null) return '';
 		return $characters === null ? mb_trim($str) : mb_trim($str, $characters);
