@@ -14,12 +14,19 @@ class DateTimeHelper {
 
 	public const string FORMAT_JSON = 'Y-m-d\TH:i:s.uP';
 
+	public const string FORMAT_CZECH_DATE = 'j.n.Y';
+
+	public const string FORMAT_CZECH_DATETIME = 'j.n.Y H:i';
+
+	public const string FORMAT_HTML_DATE = 'Y-m-d';
+
 	public static array $formats = [
 		self::FORMAT_JSON, /* ISO with microseconds and offset */
 		'Y-m-d\TH:i:sT', /* ISO with time zone */
 		DateTimeInterface::W3C, /* ISO with offset */
 		DateTimeInterface::RFC7231, /* http dates */
 		DateTimeInterface::RSS,
+		self::FORMAT_HTML_DATE
 	];
 
 	public static function toTimezone(DateTimeInterface $date, string $timeZoneName): DateTimeInterface {
@@ -70,6 +77,18 @@ class DateTimeHelper {
 
 	public static function formatForRss(DateTimeInterface $date): string {
 		return self::format($date, DateTimeInterface::RSS);
+	}
+
+	public static function formatForHtml(DateTimeInterface $date): string {
+		return self::format($date, self::FORMAT_HTML_DATE);
+	}
+
+	public static function formatCzechDate(DateTimeInterface $date): string {
+		return self::format($date, self::FORMAT_CZECH_DATE);
+	}
+
+	public static function formatCzechDatetime(DateTimeInterface $date): string {
+		return self::format($date, self::FORMAT_CZECH_DATETIME);
 	}
 
 	public static function year(?DateTimeInterface $date = null): int {
