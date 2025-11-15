@@ -79,8 +79,8 @@ class DateTimeHelper {
 		return self::format($date, DateTimeInterface::RSS);
 	}
 
-	public static function formatForHtml(DateTimeInterface $date): string {
-		return self::format($date, self::FORMAT_HTML_DATE);
+	public static function formatForHtml(?DateTimeInterface $date): string {
+		return (empty($date)) ? '' : self::format($date, self::FORMAT_HTML_DATE);
 	}
 
 	public static function formatCzechDate(DateTimeInterface $date): string {
