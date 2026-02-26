@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zavadil\Common\Client\OAuth\Payload;
+namespace Zavadil\Common\Client\OAuth\Payload\Token;
 
 class AccessTokenPayload extends TokenResponsePayloadBase {
 

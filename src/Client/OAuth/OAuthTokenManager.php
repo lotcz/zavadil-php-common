@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Zavadil\Common\Client\OAuth;
 
-use Zavadil\Common\Client\OAuth\Payload\AccessTokenPayload;
-use Zavadil\Common\Client\OAuth\Payload\IdTokenPayload;
-use Zavadil\Common\Client\OAuth\Payload\RequestAccessTokenPayload;
-use Zavadil\Common\Client\OAuth\Payload\RequestIdTokenFromLoginPayload;
-use Zavadil\Common\Client\OAuth\Payload\RequestIdTokenFromPrevTokenPayload;
+use Zavadil\Common\Client\OAuth\Payload\Request\RenewRefreshTokenPayload;
+use Zavadil\Common\Client\OAuth\Payload\Request\RequestAccessTokenPayload;
+use Zavadil\Common\Client\OAuth\Payload\Request\RequestRefreshTokenFromLoginPayload;
+use Zavadil\Common\Client\OAuth\Payload\Token\AccessTokenPayload;
+use Zavadil\Common\Client\OAuth\Payload\Token\RefreshTokenPayload;
 use Zavadil\Common\Helpers\OAuthHelper;
 
 class OAuthTokenManager {
@@ -21,7 +21,7 @@ class OAuthTokenManager {
 
 	private OAuthServerHttpClient $oAuthServer;
 
-	private ?IdTokenPayload $idToken = null;
+	private ?RefreshTokenPayload $refreshToken = null;
 
 	private array $accessTokens = [];
 
@@ -32,8 +32,8 @@ class OAuthTokenManager {
 		$this->oAuthServer = new OAuthServerHttpClient($oAuthServerBaseUrl);
 	}
 
-	private function hasValidIdToken(): bool {
-		return OAuthHelper::isValidToken($this->idToken);
+	private function hasValidRefreshToken(): bool {
+		return OAuthHelper::isValidToken($this->refreshToken);
 	}
 
 	private function getExistingAccessToken(string $privilege): ?AccessTokenPayload {
@@ -41,44 +41,40 @@ class OAuthTokenManager {
 		return $this->accessTokens[$privilege];
 	}
 
-	private function login(): IdTokenPayload {
+	private function login(): RefreshTokenPayload {
 		$this->reset();
-		$payload = new RequestIdTokenFromLoginPayload();
-		$payload->targetAudience = $this->audience;
-		$payload->login = $this->login;
-		$payload->password = $this->password;
-		$this->idToken = $this->oAuthServer->requestIdTokenFromLogin($payload);
-		return $this->idToken;
+		$payload = new RequestRefreshTokenFromLoginPayload($this->audience, $this->login, $this->password);
+		$this->refreshToken = $this->oAuthServer->requestRefreshTokenFromLogin($payload);
+		return $this->refreshToken;
 	}
 
-	private function refreshIdToken(): IdTokenPayload {
-		$payload = new RequestIdTokenFromPrevTokenPayload();
-		$payload->idToken = $this->idToken;
-		$this->idToken = $this->oAuthServer->refreshIdToken($payload);
-		return $this->idToken;
+	private function renewRefreshToken(): RefreshTokenPayload {
+		$payload = new RenewRefreshTokenPayload($this->getRefreshTokenRaw());
+		$this->refreshToken = $this->oAuthServer->renewRefreshToken($payload);
+		return $this->refreshToken;
 	}
 
 	public function reset(): void {
-		$this->idToken = null;
+		$this->refreshToken = null;
 		$this->accessTokens = [];
 	}
 
 	/**
-	 * Get id token, refresh it if needed
+	 * Get refresh token, renew it if needed
 	 */
-	public function getIdToken(): IdTokenPayload {
-		if (!$this->hasValidIdToken()) return $this->login();
-		if (OAuthHelper::isTokenReadyForRefresh($this->idToken)) return $this->refreshIdToken();
-		return $this->idToken;
+	public function getRefreshToken(): RefreshTokenPayload {
+		if (!$this->hasValidRefreshToken()) return $this->login();
+		if (OAuthHelper::isTokenReadyForRefresh($this->refreshToken)) return $this->renewRefreshToken();
+		return $this->refreshToken;
 	}
 
-	public function getIdTokenRaw(): string {
-		$idToken = $this->getIdToken();
+	public function getRefreshTokenRaw(): string {
+		$idToken = $this->getRefreshToken();
 		return $idToken->token;
 	}
 
-	public function verifyIdToken(string $token): IdTokenPayload {
-		return $this->oAuthServer->verifyIdToken($token);
+	public function verifyRefreshToken(string $token): RefreshTokenPayload {
+		return $this->oAuthServer->verifyRefreshToken($token);
 	}
 
 	/**
@@ -90,10 +86,7 @@ class OAuthTokenManager {
 			return $existing;
 		}
 
-		$payload = new RequestAccessTokenPayload();
-		$payload->targetAudience = $this->audience;
-		$payload->idToken = $this->getIdTokenRaw();
-		$payload->privilege = $privilege;
+		$payload = new RequestAccessTokenPayload($this->audience, $this->getRefreshTokenRaw(), $privilege);
 
 		$accessToken = $this->oAuthServer->requestAccessToken($payload);
 		$this->accessTokens[$privilege] = $accessToken;

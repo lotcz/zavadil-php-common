@@ -1,0 +1,9 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Zavadil\Common\Client\OAuth\Payload\Token;
+
+class RefreshTokenPayload extends TokenResponsePayloadBase {
+
+}

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Zavadil\Common\Helpers;
 
-use Zavadil\Common\Client\OAuth\Payload\TokenResponsePayloadBase;
+use Zavadil\Common\Client\OAuth\Payload\Token\TokenResponsePayloadBase;
 
 class OAuthHelper {
 

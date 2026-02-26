@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zavadil\Common\Client\OAuth\Payload;
+namespace Zavadil\Common\Client\OAuth\Payload\Token;
 
 use DateTimeInterface;
 use Zavadil\Common\Client\Payload\PayloadBase;
