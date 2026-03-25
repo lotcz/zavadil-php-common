@@ -6,5 +6,5 @@ namespace Zavadil\Common\Client\Payload;
 
 class PayloadBase {
 
-	public function hydrateData(mixed $data) {}
+	public function hydrateData($data) {}
 }
