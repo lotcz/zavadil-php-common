@@ -20,7 +20,7 @@ class PathHelper {
 			}
 		}
 		$imploded = implode("/", $trimmed);
-		return str_starts_with($parts[0], "/") ? "/" . $imploded : $imploded;
+		return StringHelper::startsWith($parts[0], "/") ? "/" . $imploded : $imploded;
 	}
 
 	public static function of(...$parts): string {

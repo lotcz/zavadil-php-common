@@ -10,11 +10,11 @@ class UrlHelper {
 		$url = PathHelper::of($baseUrl, $endpoint);
 		if (!empty($queryParams)) {
 			$query = http_build_query($queryParams);
-			$url .= (str_contains($url, '?') ? '&' : '?') . $query;
+			$url .= (StringHelper::contains($url, '?') ? '&' : '?') . $query;
 		}
 		return $url;
 	}
-	
+
 	static function slugify(string $str, string $encoding = 'UTF-8'): string {
 		if (StringHelper::isBlank($str)) return '';
 		$result = StringHelper::trimSpecial($str);
