@@ -60,6 +60,18 @@ class StringHelper {
 		return self::rtrim($s, self::$specialChars);
 	}
 
+	static function contains($haystack, $needle, $caseSensitive = true): bool {
+		if (self::isBlank($haystack) || self::isBlank($needle)) return false;
+		$i = $caseSensitive ? strpos($haystack, $needle) : stripos($haystack, $needle);
+		return $i !== false;
+	}
+
+	static function startsWith($haystack, $start, $caseSensitive = true): bool {
+		if (!$caseSensitive) return self::startsWith(strtolower($haystack), strtolower($start));
+		if (self::isBlank($haystack) || self::isBlank($start)) return false;
+		return substr($haystack, 0, strlen($start)) === $start;
+	}
+
 	static array $czech_transliteration = [
 		'á' => 'a', 'é' => 'e', 'ě' => 'e', 'í' => 'i', 'ý' => 'y', 'ó' => 'o', 'ú' => 'u', 'ů' => 'u', 'ž' => 'z', 'š' => 's', 'č' => 'c', 'ř' => 'r', 'ď' => 'd', 'ť' => 't', 'ň' => 'n',
 		'Á' => 'A', 'É' => 'E', 'Ě' => 'E', 'Í' => 'I', 'Ý' => 'Y', 'Ó' => 'O', 'Ú' => 'U', 'Ů' => 'U', 'Ž' => 'Z', 'Š' => 'S', 'Č' => 'C', 'Ř' => 'R', 'Ď' => 'D', 'Ť' => 'T', 'Ň' => 'N'
