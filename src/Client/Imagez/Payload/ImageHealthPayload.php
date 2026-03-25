@@ -16,18 +16,20 @@ class ImageHealthPayload extends PayloadBase {
 
 	public string $mime;
 
-	public function __construct(
+	public static function of(
 		string $name,
 		int $size,
 		int $width,
 		int $height,
 		string $mime
-	) {
-		$this->name = $name;
-		$this->size = $size;
-		$this->width = $width;
-		$this->height = $height;
-		$this->mime = $mime;
+	): ImageHealthPayload {
+		$obj = new self();
+		$obj->name = $name;
+		$obj->size = $size;
+		$obj->width = $width;
+		$obj->height = $height;
+		$obj->mime = $mime;
+		return $obj;
 	}
 
 }

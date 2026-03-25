@@ -6,5 +6,5 @@ namespace Zavadil\Common\Client\OAuth\Payload\Token;
 
 class AccessTokenPayload extends TokenResponsePayloadBase {
 
-    public ?string[] $scopes = null;
+	public ?array $scopes = null;
 }
