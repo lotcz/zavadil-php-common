@@ -32,8 +32,10 @@ class HttpClient implements RestClient {
 		];
 	}
 
-	private function prepareHeaders(): array {
-		$headers = $this->getHeaders();
+	protected function prepareHeaders(?array $headers = null): array {
+		if ($headers === null) {
+			$headers = $this->getHeaders();
+		}
 
 		// Convert associative headers to cURL format
 		$curlHeaders = [];
@@ -43,7 +45,7 @@ class HttpClient implements RestClient {
 		return $curlHeaders;
 	}
 
-	private function extractErrorMessage(string $body): ?string {
+	protected function extractErrorMessage(string $body): ?string {
 		if (StringHelper::isBlank($body)) {
 			return null;
 		}
@@ -62,7 +64,7 @@ class HttpClient implements RestClient {
 		}
 	}
 
-	private function buildUrl(string $endpoint, ?array $queryParams = null): string {
+	protected function buildUrl(string $endpoint, ?array $queryParams = null): string {
 		return UrlHelper::of($this->baseUrl, $endpoint, $queryParams);
 	}
 
