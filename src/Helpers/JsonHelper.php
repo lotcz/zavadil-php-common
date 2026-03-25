@@ -19,7 +19,7 @@ class JsonHelper {
 	 * @param mixed $value
 	 * @return mixed
 	 */
-	public static function normalizeForJson(mixed $value): mixed {
+	public static function normalizeForJson($value) {
 		if ($value instanceof DateTimeInterface) {
 			return DateTimeHelper::formatForJson($value);
 		}
@@ -40,12 +40,12 @@ class JsonHelper {
 		return $value;
 	}
 
-	public static function encode(mixed $data): string {
+	public static function encode($data): string {
 		$obj = self::normalizeForJson($data);
 		return json_encode($obj, JSON_THROW_ON_ERROR, 512);
 	}
 
-	public static function hydrateToClass(?string $className, mixed $obj, $classUsed = false): mixed {
+	public static function hydrateToClass(?string $className, $obj, $classUsed = false) {
 		if (is_object($obj) && $className !== null) {
 			$instance = new $className();
 
@@ -80,7 +80,7 @@ class JsonHelper {
 		return $obj;
 	}
 
-	public static function decode(?string $data, ?string $className = null): mixed {
+	public static function decode(?string $data, ?string $className = null) {
 		if (StringHelper::isBlank($data)) return null;
 		$obj = json_decode($data, false, 512, JSON_THROW_ON_ERROR);
 		return self::hydrateToClass($className, $obj);
