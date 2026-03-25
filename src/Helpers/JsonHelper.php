@@ -52,7 +52,8 @@ class JsonHelper {
 			foreach ($obj as $key => $value) {
 				if (property_exists($instance, $key)) {
 					$rp = new ReflectionProperty($instance, $key);
-					$type = $rp->getType()?->getName();
+					$typ = $rp->getType();
+					$type = empty($typ) ? null : $typ->getName();
 					if ($type === DateTimeInterface::class && is_string($value) && StringHelper::notBlank($value)) {
 						$instance->$key = DateTimeHelper::parse($value, true);
 					} else {
