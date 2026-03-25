@@ -30,17 +30,20 @@ class StringHelper {
 
 	public static function trim(?string $str, ?string $characters = null): string {
 		if ($str === null) return '';
-		return function_exists('mb_trim') ? mb_trim($str, $characters) : trim($str, $characters);
+		if (function_exists('mb_trim')) return mb_trim($str, $characters);
+		return ($characters === null) ? trim($str) : trim($str, $characters);
 	}
 
 	public static function ltrim(?string $str, ?string $characters = null): string {
 		if ($str === null) return '';
-		return function_exists('mb_ltrim') ? mb_ltrim($str, $characters) : ltrim($str, $characters);
+		if (function_exists('mb_ltrim')) return mb_ltrim($str, $characters);
+		return ($characters === null) ? ltrim($str) : ltrim($str, $characters);
 	}
 
 	public static function rtrim(?string $str, ?string $characters = null): string {
 		if ($str === null) return '';
-		return function_exists('mb_rtrim') ? mb_rtrim($str, $characters) : rtrim($str, $characters);
+		if (function_exists('mb_rtrim')) return mb_rtrim($str, $characters);
+		return ($characters === null) ? rtrim($str) : rtrim($str, $characters);
 	}
 
 	static string $specialChars = ' .,-*/?!\'"';
