@@ -53,7 +53,7 @@ class ImagezHttpClient extends HttpClient {
 		}
 
 		$url = $this->buildUrl('images/upload', ['token' => $this->secretToken]);
-		$headers = $this->prepareHeaders(['Accept: application/json, */*;q=0.8']);
+		$headers = $this->prepareHeaders(['Accept' => 'application/json, */*;q=0.8']);
 
 		$options = [
 			CURLOPT_URL => $url,
