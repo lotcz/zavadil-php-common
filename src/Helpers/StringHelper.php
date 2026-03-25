@@ -8,7 +8,7 @@ class StringHelper {
 
 	public static function strlen(?string $str): int {
 		if ($str === null) return 0;
-		return mb_strlen($str);
+		return function_exists('mb_strlen') ? mb_strlen($str) : strlen($str);
 	}
 
 	public static function isBlank(?string $str): bool {
@@ -30,17 +30,17 @@ class StringHelper {
 
 	public static function trim(?string $str, ?string $characters = null): string {
 		if ($str === null) return '';
-		return $characters === null ? mb_trim($str) : mb_trim($str, $characters);
+		return function_exists('mb_trim') ? mb_trim($str, $characters) : trim($str, $characters);
 	}
 
 	public static function ltrim(?string $str, ?string $characters = null): string {
 		if ($str === null) return '';
-		return $characters === null ? mb_ltrim($str) : mb_ltrim($str, $characters);
+		return function_exists('mb_ltrim') ? mb_ltrim($str, $characters) : ltrim($str, $characters);
 	}
 
 	public static function rtrim(?string $str, ?string $characters = null): string {
 		if ($str === null) return '';
-		return $characters === null ? mb_rtrim($str) : mb_rtrim($str, $characters);
+		return function_exists('mb_rtrim') ? mb_rtrim($str, $characters) : rtrim($str, $characters);
 	}
 
 	static string $specialChars = ' .,-*/?!\'"';
@@ -78,7 +78,8 @@ class StringHelper {
 		if (self::isBlank($str)) return null;
 		if (self::strlen($str) > $len) {
 			$length = $len - self::strlen($ellipsis);
-			return mb_substr($str, 0, $length) . $ellipsis;
+			$short = function_exists('mb_substr') ? mb_substr($str, 0, $length) : substr($str, 0, $length);
+			return $short . $ellipsis;
 		} else {
 			return $str;
 		}
