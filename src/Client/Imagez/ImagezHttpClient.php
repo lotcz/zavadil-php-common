@@ -46,7 +46,7 @@ class ImagezHttpClient extends HttpClient {
 		);
 	}
 
-	private function uploadFile(string $file): ImageHealthPayload {
+	public function uploadFile(string $file): ImageHealthPayload {
 		$ch = curl_init();
 		if ($ch === false) {
 			throw new \Exception('Failed to initialize cURL');
