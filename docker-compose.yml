@@ -1,6 +1,6 @@
 services:
   composer:
-    image: composer:2
+    image: composer
     container_name: php-common-composer
     volumes:
       - ./:/app
